@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 /** @group UsersTest */
-class UsersTest extends TestCase
+class UserRegistrationTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
@@ -26,11 +26,12 @@ class UsersTest extends TestCase
     }
 
     /** @test */
-    public function it_validate_user_registration(): void
+    public function it_validate_user_registration_required_parameters(): void
     {
         $response = $this->postJson($this->uri('/users'))
             ->assertStatus(StatusCodeEnum::UNPROCESSABLE_ENTITY);
         $errors = $this->assertErrorJsonResponse($response)['errors'];
+        $this->assertCount(3, $errors);
         $this->assertArrayHasKey('name', $errors);
         $this->assertArrayHasKey('email', $errors);
         $this->assertArrayHasKey('password', $errors);
@@ -47,6 +48,19 @@ class UsersTest extends TestCase
     }
 
     /** @test */
+    public function it_validate_user_registration_unique_email(): void
+    {
+        $this->postJson($this->uri('/users'), $this->data());
+
+        $user = User::first();
+
+        $response = $this->postJson($this->uri('/users'), ['email' => $user->email] + $this->data());
+        $errors = $this->assertErrorJsonResponse($response)['errors'];
+        $this->assertCount(1, $errors);
+        $this->assertArrayHasKey('email', $errors);
+    }
+
+    /** @test */
     public function it_should_set_new_user_email_not_verified_and_inactive(): void
     {
         $this->postJson($this->uri('/users'), $this->data());
@@ -60,12 +74,7 @@ class UsersTest extends TestCase
     public function it_should_send_an_email_verification(): void
     {
         Mail::fake();
-
-        $this->postJson($this->uri('/users'), $this->data())
-            ->assertStatus(StatusCodeEnum::OK);
-
-        Mail::assertSent(function (NewUserEmailVerification $mail) {
-            return $mail->to[0]['email'] = User::first()->email;
-        });
+        $this->postJson($this->uri('/users'), $this->data());
+        Mail::assertSent(NewUserEmailVerification::class);
     }
 }
