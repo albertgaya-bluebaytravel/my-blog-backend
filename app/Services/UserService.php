@@ -12,7 +12,7 @@ class UserService
     {
         $user = User::create($data);
 
-        Mail::to($user)->send(new NewUserEmailVerification());
+        Mail::to($user)->send(new NewUserEmailVerification($user));
 
         return $user;
     }

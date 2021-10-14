@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -11,14 +12,16 @@ class NewUserEmailVerification extends Mailable
 {
     use Queueable, SerializesModels;
 
+    protected User $user;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(User $user)
     {
-        //
+        $this->user = $user;
     }
 
     /**
@@ -28,6 +31,6 @@ class NewUserEmailVerification extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.users.emailVerification');
+        return $this->markdown('emails.users.emailVerification', ['user' => $this->user]);
     }
 }
