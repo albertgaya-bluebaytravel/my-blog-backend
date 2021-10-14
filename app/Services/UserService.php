@@ -2,18 +2,23 @@
 
 namespace App\Services;
 
-use App\Mail\NewUserEmailVerification;
 use App\Models\User;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
 
 class UserService
 {
     public function store(array $data): User
     {
         $user = User::create($data);
-
-        Mail::to($user)->send(new NewUserEmailVerification($user));
-
+        $user->sendEmailVerificationNotification();
         return $user;
+    }
+
+    public function verify(string $encryptedUserId): void
+    {
+        $id = Crypt::decrypt($encryptedUserId);
+
+        $user = User::findOrFail($id);
+        $user->markEmailAsVerified();
     }
 }

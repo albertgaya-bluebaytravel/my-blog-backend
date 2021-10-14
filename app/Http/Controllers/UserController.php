@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\UserService;
-use App\Http\Requests\Users\UserStoreRequest;
 use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Users\UserStoreRequest;
 
 class UserController extends Controller
 {
@@ -40,9 +41,9 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  UserStoreRequest  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function store(UserStoreRequest $request)
+    public function store(UserStoreRequest $request): JsonResponse
     {
         $user = $this->userService->store($request->validated());
 
@@ -92,5 +93,18 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * Verify user account
+     * 
+     * @param string $encryptedUserId
+     * @return JsonResponse
+     */
+    public function verify(string $encryptedUserId): JsonResponse
+    {
+        $this->userService->verify($encryptedUserId);
+
+        return Response::jsonSuccess([], 'Email address successfully verified!');
     }
 }

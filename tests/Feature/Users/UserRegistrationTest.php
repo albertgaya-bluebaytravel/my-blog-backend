@@ -3,11 +3,11 @@
 namespace Tests\Feature\Users;
 
 use App\Enums\StatusCodeEnum;
-use App\Mail\NewUserEmailVerification;
 use App\Models\User;
+use App\Notifications\NewUserVerification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 /** @group UsersTest */
@@ -73,8 +73,8 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function it_should_send_an_email_verification(): void
     {
-        Mail::fake();
+        Notification::fake();
         $this->postJson($this->uri('/users'), $this->data());
-        Mail::assertSent(NewUserEmailVerification::class);
+        Notification::assertSentTo(User::first(), NewUserVerification::class);
     }
 }

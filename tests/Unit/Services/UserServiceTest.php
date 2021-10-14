@@ -2,14 +2,13 @@
 
 namespace Tests\Unit\Services;
 
-use Exception;
 use Tests\TestCase;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\NewUserEmailVerification;
+use App\Notifications\NewUserVerification;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /** @group UserServiceTest */
@@ -51,13 +50,9 @@ class UserServiceTest extends TestCase
     /** @test */
     public function it_send_new_added_user_an_email_verification(): void
     {
-        Mail::fake();
-
+        Notification::fake();
         $storeData = $this->storeData();
         $user = $this->userService->store($storeData);
-
-        Mail::assertSent(function (NewUserEmailVerification $mail) use ($user) {
-            return $mail->to[0]['email'] = $user->email;
-        });
+        Notification::assertSentTo($user, NewUserVerification::class);
     }
 }
