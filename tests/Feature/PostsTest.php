@@ -4,10 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Post;
-use App\Models\User;
 use App\Models\Comment;
-use Laravel\Sanctum\Sanctum;
-use App\Enums\StatusCodeEnum;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -66,8 +63,8 @@ class PostsTest extends TestCase
         $post = Post::find($dataPost['id']);
         $this->assertNotNull($user);
 
-        $this->assertEquals($param['title'], $post['title']);
-        $this->assertEquals($param['body'], $post['body']);
+        $this->assertEquals($param['title'], $dataPost['title']);
+        $this->assertEquals($param['body'], $dataPost['body']);
 
         $this->assertTrue($post->user->is($user));
         $this->assertCount(1, $user->posts);
@@ -86,24 +83,34 @@ class PostsTest extends TestCase
         $this->assertArrayHasKey('body', $errors);
     }
 
+    /** @test */
+    public function post_posts_comments_invalid_post(): void
+    {
+        $this->createSigninUser();
+        $this->postJson($this->uri('/posts/123/comments'))
+            ->assertNotFound();
+    }
 
     /** @test */
-    public function it_can_create_a_comment_to_a_post(): void
+    public function post_posts_comments(): void
     {
-        $user = User::factory()->verified()->create();
-        Sanctum::actingAs($user);
-
+        $this->createSigninUser();
         $post = Post::factory()->create();
         $param = ['body' => $this->faker->paragraph];
-        $response = $this->postJson($this->uri('/posts/' . $post->id . '/comments'), $param)
-            ->assertStatus(StatusCodeEnum::OK);
-
-        $this->assertDatabaseCount(Comment::class, 1);
-        $this->assertNotNull(Comment::first()->post);
-        $this->assertCount(1, $post->refresh()->comments);
+        $response = $this->postJson($this->uri("/posts/{$post->id}/comments"), $param)
+            ->assertOk();
 
         $data = $this->assertSuccessJsonResponse($response)['data'];
-        $this->assertArrayHasKey('post', $data);
+
         $this->assertArrayHasKey('comment', $data);
+        $dataComment = $data['comment'];
+
+        $comment = Comment::find($dataComment['id']);
+        $this->assertNotNull($comment);
+
+        $this->assertEquals($param['body'], $dataComment['body']);
+
+        $this->assertTrue($comment->post->is($post));
+        $this->assertCount(1, $post->comments);
     }
 }

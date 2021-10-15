@@ -2,10 +2,11 @@
 
 namespace Tests;
 
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
-use Illuminate\Testing\Assert;
-use Illuminate\Testing\AssertableJsonString;
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
 use Illuminate\Testing\TestResponse;
+use Illuminate\Testing\AssertableJsonString;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -16,6 +17,13 @@ abstract class TestCase extends BaseTestCase
     protected function uri(string $uri): string
     {
         return $this->urlPrefix . $uri;
+    }
+
+    protected function createSigninUser(): User
+    {
+        $user = User::factory()->verified()->create();
+        Sanctum::actingAs($user);
+        return $user;
     }
 
     protected function assertSuccessJsonResponse(TestResponse $response): AssertableJsonString
