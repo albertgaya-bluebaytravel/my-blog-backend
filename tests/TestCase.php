@@ -16,7 +16,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function uri(string $uri): string
     {
-        return $this->urlPrefix . $uri;
+        return prefix_url($uri);
     }
 
     protected function createSigninUser(): User
