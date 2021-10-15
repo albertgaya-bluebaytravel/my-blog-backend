@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
-/** @group UsersTest */
+/** @group UserRegistrationTest */
 class UserRegistrationTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
