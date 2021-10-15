@@ -45,4 +45,17 @@ class UserFactory extends Factory
             ];
         });
     }
+
+    /**
+     * User account should be verified
+     * 
+     * @return Factory
+     */
+    public function verified(): Factory
+    {
+        return $this->state(fn () => [
+            'email_verified_at' => now(),
+            'is_active' => 1
+        ]);
+    }
 }

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use App\Enums\StatusCodeEnum;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -13,29 +12,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 class AuthenticationTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
-
-    protected function createUser(string $password = ''): User
-    {
-        if (!$password) {
-            $password = $this->faker->password;
-        }
-
-        $data = [
-            'name' => $this->faker->name,
-            'email' => $this->faker->email,
-            'password' => $password,
-            'password_confirmation' => $password
-        ];
-
-        $this->postJson($this->uri('/users'), $data);
-
-        $user = User::first();
-
-        $this->postJson($this->uri('/users/' . Crypt::encrypt($user->id) . '/verify'))
-            ->assertStatus(StatusCodeEnum::OK);
-
-        return $user;
-    }
 
     /** @test */
     public function it_can_validate_login_required_parameters(): void
@@ -52,7 +28,7 @@ class AuthenticationTest extends TestCase
     public function it_can_login_user_and_get_token(): void
     {
         $password = $this->faker->password;
-        $user = $this->createUser($password);
+        $user = User::factory()->create(['password' => $password]);
 
         $response = $this->postJson($this->uri('/login'), [
             'email' => $user->email,

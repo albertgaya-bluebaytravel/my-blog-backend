@@ -25,6 +25,6 @@ class AuthService
             ]);
         }
 
-        return $user->createToken(config('app.name'))->plainTextToken;
+        return $user->generateToken();
     }
 }
