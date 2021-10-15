@@ -2,7 +2,11 @@
 
 namespace App\Exceptions;
 
+use App\Enums\StatusCodeEnum;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -36,6 +40,14 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        $this->renderable(function (NotFoundHttpException $e) {
+            return Response::jsonError([], $e->getMessage(), StatusCodeEnum::NOT_FOUND);
+        });
+
+        $this->renderable(function (UnprocessableEntityHttpException $e) {
+            return Response::jsonError([], $e->getMessage(), StatusCodeEnum::UNPROCESSABLE_ENTITY);
         });
     }
 }

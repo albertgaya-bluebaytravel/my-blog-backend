@@ -35,24 +35,23 @@ class UserServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_can_store_user_data(): void
+    public function store_user_data(): void
     {
-        $storeData = $this->storeData();
-        $user = $this->userService->store($storeData);
+        $data = $this->storeData();
+        $user = $this->userService->store($data);
         $this->assertDatabaseCount(User::class, 1);
-        $this->assertEquals($storeData['name'], $user->name);
-        $this->assertEquals($storeData['email'], $user->email);
-        $this->assertTrue(Hash::check($storeData['password'], $user->password));
+        $this->assertEquals($data['name'], $user->name);
+        $this->assertEquals($data['email'], $user->email);
+        $this->assertTrue(Hash::check($data['password'], $user->password));
         $this->assertNull($user->email_verified_at);
-        $this->assertEquals(0, $user->active);
+        $this->assertEquals(0, $user->is_active);
     }
 
     /** @test */
-    public function it_send_new_added_user_an_email_verification(): void
+    public function store_user_email_notification(): void
     {
         Notification::fake();
-        $storeData = $this->storeData();
-        $user = $this->userService->store($storeData);
+        $user = $this->userService->store($this->storeData());
         Notification::assertSentTo($user, NewUserVerification::class);
     }
 }
