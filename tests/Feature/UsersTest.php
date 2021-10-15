@@ -83,8 +83,6 @@ class UsersTest extends TestCase
         $this->assertNull($user->email_verified_at);
         $this->assertEquals(0, $user->is_active);
 
-        $this->postJson($this->uri('/users'), $this->data());
-
         Notification::assertSentTo($user, NewUserVerification::class);
     }
 

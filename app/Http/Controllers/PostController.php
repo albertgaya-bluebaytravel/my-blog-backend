@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PostStoreRequest;
+use App\Http\Requests\Posts\PostStoreRequest;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -17,6 +17,12 @@ class PostController extends Controller
         $this->postService = $postService;
     }
 
+    /**
+     * Create new post
+     * 
+     * @param PostStoreRequest $request
+     * @return JsonResponse
+     */
     public function store(PostStoreRequest $request): JsonResponse
     {
         $post = $this->postService->store($request->validated(), Auth::user());
