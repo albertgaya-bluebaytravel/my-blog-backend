@@ -18,6 +18,16 @@ class PostController extends Controller
     }
 
     /**
+     * Get list of Post
+     * 
+     * @return JsonResponse
+     */
+    public function index(): JsonResponse
+    {
+        return Response::jsonSuccess(['posts' => $this->postService->all()]);
+    }
+
+    /**
      * Create new post
      * 
      * @param PostStoreRequest $request

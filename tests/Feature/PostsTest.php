@@ -28,6 +28,20 @@ class PostsTest extends TestCase
     }
 
     /** @test */
+    public function get_posts(): void
+    {
+        $posts = Post::factory()->count(10)->create();
+
+        $response = $this->getJson($this->uri('/posts'))
+            ->assertOk();
+
+        $data = $this->assertSuccessJsonResponse($response)['data'];
+
+        $this->assertArrayHasKey('posts', $data);
+        $this->assertSameSize($posts, $data['posts']);
+    }
+
+    /** @test */
     public function post_posts_non_authorized_user(): void
     {
         $this->postJson($this->uri('/posts'))

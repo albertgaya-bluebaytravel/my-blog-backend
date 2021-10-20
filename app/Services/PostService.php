@@ -4,9 +4,20 @@ namespace App\Services;
 
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 class PostService
 {
+    /**
+     * List of Post
+     * 
+     * @return Collection
+     */
+    public function all(): Collection
+    {
+        return Post::all();
+    }
+
     /**
      * Create Post data
      * 

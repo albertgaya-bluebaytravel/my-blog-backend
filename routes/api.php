@@ -23,7 +23,11 @@ Route::prefix('/users')->group(function () {
     Route::get('/auth', [UserController::class, 'auth'])->middleware('auth:sanctum');
 });
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/posts', [PostController::class, 'store']);
-    Route::post('/posts/{post}/comments', [CommentController::class, 'store']);
+Route::prefix('/posts')->group(function () {
+    Route::get('/', [PostController::class, 'index']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/', [PostController::class, 'store']);
+        Route::post('/{post}/comments', [CommentController::class, 'store']);
+    });
 });
