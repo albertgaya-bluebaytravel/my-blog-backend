@@ -20,6 +20,7 @@ Route::prefix('/users')->group(function () {
     Route::get('/{user}/verify', [UserController::class, 'verify']);
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
+    Route::get('/auth', [UserController::class, 'auth']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

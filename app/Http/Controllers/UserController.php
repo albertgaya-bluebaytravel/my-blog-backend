@@ -8,6 +8,7 @@ use App\Services\UserService;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -55,5 +56,15 @@ class UserController extends Controller
         $token = $this->userService->login($request->email, $request->password);
 
         return Response::jsonSuccess(['token' => $token]);
+    }
+
+    /**
+     * Get Authenticated User
+     * 
+     * @return JsonResponse
+     */
+    public function auth(): JsonResponse
+    {
+        return Response::jsonSuccess(['user' => Auth::user()]);
     }
 }

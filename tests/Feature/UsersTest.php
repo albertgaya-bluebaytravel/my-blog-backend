@@ -155,4 +155,26 @@ class UsersTest extends TestCase
         $this->assertArrayHasKey('token', $data);
         $this->assertNotEmpty($data['token']);
     }
+
+    /** @test */
+    public function get_users_auth_non_login_user(): void
+    {
+        $response = $this->getJson('/users/auth')
+            ->assertNotFound();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function get_users_auth(): void
+    {
+        $user = $this->createSigninUser();
+        $response = $this->getJson($this->uri('/users/auth'))
+            ->assertOk();
+
+        $data = $this->assertSuccessJsonResponse($response)['data'];
+
+        $this->assertArrayHasKey('user', $data);
+        $dataUser = $data['user'];
+        $this->assertEquals($user->id, $dataUser['id']);
+    }
 }
