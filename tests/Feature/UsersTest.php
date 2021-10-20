@@ -82,6 +82,7 @@ class UsersTest extends TestCase
 
         $this->assertNull($user->email_verified_at);
         $this->assertEquals(0, $user->is_active);
+        $this->assertNotNull($user->email_verification_token);
 
         Notification::assertSentTo($user, NewUserVerification::class);
     }
@@ -99,7 +100,17 @@ class UsersTest extends TestCase
     {
         $user = User::factory()->verified()->create();
 
-        $response = $this->getJson($this->uri("/users/{$user->id}/verify"))
+        $response = $this->getJson($this->uri("/users/{$user->id}/verify/{$user->email_verification_token}"))
+            ->assertUnprocessable();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function post_users_verifiy_invalid_token(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        $response = $this->getJson($this->uri("/users/{$user->id}/verify/123"))
             ->assertUnprocessable();
         $this->assertErrorJsonResponse($response);
     }
@@ -109,7 +120,7 @@ class UsersTest extends TestCase
     {
         $user = User::factory()->unverified()->create();
 
-        $this->getJson($this->uri("/users/{$user->id}/verify"))
+        $this->getJson($this->uri("/users/{$user->id}/verify/{$user->email_verification_token}"))
             ->assertOk();
 
         $user->refresh();

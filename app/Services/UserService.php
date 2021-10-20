@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
@@ -16,7 +17,9 @@ class UserService
      */
     public function store(array $data): User
     {
-        $user = User::create($data);
+        $user = new User($data);
+        $user->email_verification_token = Str::random();
+        $user->save();
         $user->sendEmailVerificationNotification();
         return $user;
     }
@@ -27,10 +30,14 @@ class UserService
      * @param User $user
      * @return void
      */
-    public function verify(User $user): void
+    public function verify(User $user, string $token): void
     {
         if ($user->hasVerifiedEmail()) {
             throw new UnprocessableEntityHttpException('User email already been verified!');
+        }
+
+        if ($user->email_verification_token !== $token) {
+            throw new UnprocessableEntityHttpException('Invalid email verification token!');
         }
 
         $user->markEmailAsVerified();

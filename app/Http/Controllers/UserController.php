@@ -36,11 +36,12 @@ class UserController extends Controller
      * Verify user account
      * 
      * @param User $user
+     * @param string $token
      * @return JsonResponse
      */
-    public function verify(User $user): JsonResponse
+    public function verify(User $user, string $token): JsonResponse
     {
-        $this->userService->verify($user);
+        $this->userService->verify($user, $token);
 
         return Response::jsonSuccess([], 'Email address successfully verified!');
     }

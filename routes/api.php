@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('/users')->group(function () {
-    Route::get('/{user}/verify', [UserController::class, 'verify']);
+    Route::get('/{user}/verify/{token}', [UserController::class, 'verify']);
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
     Route::get('/auth', [UserController::class, 'auth']);

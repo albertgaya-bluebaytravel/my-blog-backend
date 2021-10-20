@@ -79,7 +79,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getVerifyAccountUrlAttribute(): string
     {
-        return prefix_url("users/{$this->id}/verify");
+        return env('APP_API_URL') . '/verify-account/' . $this->id;
     }
 
     /** Custom Methods */
