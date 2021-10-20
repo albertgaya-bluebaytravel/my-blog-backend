@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Posts\PostStoreRequest;
+use App\Models\Post;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -24,7 +25,13 @@ class PostController extends Controller
      */
     public function index(): JsonResponse
     {
-        return Response::jsonSuccess(['posts' => $this->postService->all()]);
+        $query = Post::query()
+            ->with('user')
+            ->orderBy('id', 'desc');
+
+        $posts = $this->postService->all($query);
+
+        return Response::jsonSuccess(['posts' => $posts]);
     }
 
     /**

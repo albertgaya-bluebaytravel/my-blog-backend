@@ -38,7 +38,10 @@ class PostsTest extends TestCase
         $data = $this->assertSuccessJsonResponse($response)['data'];
 
         $this->assertArrayHasKey('posts', $data);
-        $this->assertSameSize($posts, $data['posts']);
+
+        $dataPosts = $data['posts'];
+        $this->assertSameSize($posts, $posts);
+        $this->assertEquals($posts->last()->id, $dataPosts[0]['id']);
     }
 
     /** @test */
