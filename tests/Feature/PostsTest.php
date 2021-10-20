@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Post;
 use App\Models\Comment;
+use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -30,7 +31,8 @@ class PostsTest extends TestCase
     /** @test */
     public function get_posts(): void
     {
-        $posts = Post::factory()->count(10)->create();
+        $user = User::factory()->create();
+        $posts = Post::factory()->count(10)->create(['user_id' => $user]);
 
         $response = $this->getJson($this->uri('/posts'))
             ->assertOk();
@@ -41,7 +43,13 @@ class PostsTest extends TestCase
 
         $dataPosts = $data['posts'];
         $this->assertSameSize($posts, $posts);
-        $this->assertEquals($posts->last()->id, $dataPosts[0]['id']);
+
+        $dataPost = current($dataPosts);
+        $this->assertEquals($posts->last()->id, $dataPost['id']);
+
+        $this->assertArrayHasKey('user', $dataPost);
+        $dataUser = $dataPost['user'];
+        $this->assertEquals($user->id, $dataUser['id']);
     }
 
     /** @test */
