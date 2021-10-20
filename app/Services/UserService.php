@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -48,16 +49,12 @@ class UserService
      * 
      * @param string $email
      * @param string $password
-     * @return string
+     * @return void
      */
-    public function login(string $email, string $password): string
+    public function login(string $email, string $password): void
     {
-        $user = User::where('email', $email)->first();
-
-        if (!$user || !$user->is_active || !Hash::check($password, $user->password)) {
+        if (!Auth::attempt(['email' => $email, 'password' => $password])) {
             throw new UnprocessableEntityHttpException('The provided credentials are incorrect!');
         }
-
-        return $user->generateToken();
     }
 }

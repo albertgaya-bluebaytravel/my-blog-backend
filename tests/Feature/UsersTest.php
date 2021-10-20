@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Notifications\NewUserVerification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -157,14 +158,12 @@ class UsersTest extends TestCase
         $password = $this->faker->password;
         $user = User::factory()->verified()->create(['password' => $password]);
 
-        $response = $this->postJson($this->uri('/users/login'), [
+        $this->postJson($this->uri('/users/login'), [
             'email' => $user->email,
             'password' => $password
         ])->assertOk();
 
-        $data = $this->assertSuccessJsonResponse($response)['data'];
-        $this->assertArrayHasKey('token', $data);
-        $this->assertNotEmpty($data['token']);
+        $this->assertTrue($user->is(Auth::user()));
     }
 
     /** @test */
