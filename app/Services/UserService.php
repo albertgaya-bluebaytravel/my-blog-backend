@@ -53,7 +53,7 @@ class UserService
      */
     public function login(string $email, string $password): void
     {
-        if (!Auth::attempt(['email' => $email, 'password' => $password])) {
+        if (!Auth::attempt(['email' => $email, 'password' => $password, 'is_active' => 1])) {
             throw new UnprocessableEntityHttpException('The provided credentials are incorrect!');
         }
     }

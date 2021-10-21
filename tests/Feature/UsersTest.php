@@ -153,6 +153,20 @@ class UsersTest extends TestCase
     }
 
     /** @test */
+    public function post_users_login_unverified_user(): void
+    {
+        $password = $this->faker->password;
+        $user = User::factory()->unverified()->create(['password' => $password]);
+
+        $response = $this->postJson($this->uri('/users/login'), [
+            'email' => $user->email,
+            'password' => $password
+        ])
+            ->assertUnprocessable();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
     public function post_users_login(): void
     {
         $password = $this->faker->password;
