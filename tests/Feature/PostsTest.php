@@ -53,6 +53,22 @@ class PostsTest extends TestCase
     }
 
     /** @test */
+    public function get_single_post(): void
+    {
+        $post = Post::factory()->create();
+
+        $response = $this->getJson($this->uri("/posts/{$post->id}"))
+            ->assertOk();
+
+        $data = $this->assertSuccessJsonResponse($response)['data'];
+
+        $this->assertArrayHasKey('post', $data);
+
+        $dataPost = $data['post'];
+        $this->assertEquals($post->id, $dataPost['id']);
+    }
+
+    /** @test */
     public function post_posts_non_authorized_user(): void
     {
         $this->postJson($this->uri('/posts'))

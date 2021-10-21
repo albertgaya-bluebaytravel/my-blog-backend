@@ -35,6 +35,17 @@ class PostController extends Controller
     }
 
     /**
+     * Get single Post
+     * 
+     * @param Post $post
+     * @return JsonResponse
+     */
+    public function show(Post $post): JsonResponse
+    {
+        return Response::jsonSuccess(['post' => $post]);
+    }
+
+    /**
      * Create new post
      * 
      * @param PostStoreRequest $request
