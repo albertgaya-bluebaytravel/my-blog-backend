@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class PostService
 {
@@ -38,5 +39,17 @@ class PostService
         $post->save();
 
         return $post;
+    }
+
+    /**
+     * Update Post data
+     * 
+     * @param Post $post
+     * @param array $data
+     * @return bool
+     */
+    public function update(Post $post, array $data): bool
+    {
+        return $post->update($data);
     }
 }

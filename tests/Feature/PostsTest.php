@@ -154,4 +154,51 @@ class PostsTest extends TestCase
         $this->assertTrue($comment->post->is($post));
         $this->assertCount(1, $post->comments);
     }
+
+    /** @test */
+    public function patch_single_post_non_signin_user(): void
+    {
+        $post = Post::factory()->create();
+
+        $response = $this->patchJson($this->uri("/posts/{$post->id}"))
+            ->assertForbidden();
+
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function patch_single_post_non_authorized_user(): void
+    {
+        $this->createSigninUser();
+        $post = Post::factory()->create();
+
+        $response = $this->patchJson($this->uri("/posts/{$post->id}"))
+            ->assertForbidden();
+
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function patch_single_post(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create(['user_id' => $user]);
+
+        $param = [
+            'title' => $this->faker->title,
+            'body' => $this->faker->paragraph,
+        ];
+
+        $response = $this->patchJson($this->uri("/posts/{$post->id}"), $param)
+            ->assertOk();
+
+        $data = $this->assertSuccessJsonResponse($response)['data'];
+
+        $this->assertArrayHasKey('post', $data);
+        $dataPost = $data['post'];
+        $post->refresh();
+        $this->assertEquals($post->id, $dataPost['id']);
+        $this->assertEquals($post->title, $param['title']);
+        $this->assertEquals($post->body, $param['body']);
+    }
 }

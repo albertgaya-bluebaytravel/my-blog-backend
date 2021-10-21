@@ -26,6 +26,7 @@ Route::prefix('/users')->group(function () {
 Route::prefix('/posts')->group(function () {
     Route::get('/', [PostController::class, 'index']);
     Route::get('/{post}', [PostController::class, 'show']);
+    Route::patch('/{post}', [PostController::class, 'update']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [PostController::class, 'store']);

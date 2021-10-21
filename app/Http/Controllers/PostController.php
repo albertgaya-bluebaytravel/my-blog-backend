@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Posts\PostStoreRequest;
+use App\Http\Requests\Posts\PostUpdateRequest;
 use App\Models\Post;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
@@ -54,6 +55,13 @@ class PostController extends Controller
     public function store(PostStoreRequest $request): JsonResponse
     {
         $post = $this->postService->store($request->validated(), Auth::user());
+
+        return Response::jsonSuccess(['post' => $post]);
+    }
+
+    public function update(PostUpdateRequest $request, Post $post): JsonResponse
+    {
+        $this->postService->update($post, $request->validated());
 
         return Response::jsonSuccess(['post' => $post]);
     }

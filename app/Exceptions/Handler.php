@@ -2,12 +2,13 @@
 
 namespace App\Exceptions;
 
-use App\Enums\StatusCodeEnum;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Throwable;
+use App\Enums\StatusCodeEnum;
+use Illuminate\Http\Response;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -42,12 +43,13 @@ class Handler extends ExceptionHandler
             //
         });
 
-        $this->renderable(function (NotFoundHttpException $e) {
-            return Response::jsonError([], $e->getMessage(), StatusCodeEnum::NOT_FOUND);
-        });
+        $this->renderable(fn (NotFoundHttpException $e) => $this->jsonError($e->getMessage(), StatusCodeEnum::NOT_FOUND));
+        $this->renderable(fn (UnprocessableEntityHttpException $e) => $this->jsonError($e->getMessage(), StatusCodeEnum::UNPROCESSABLE_ENTITY));
+        $this->renderable(fn (AccessDeniedHttpException $e) => $this->jsonError($e->getMessage(), StatusCodeEnum::FORBIDDEN));
+    }
 
-        $this->renderable(function (UnprocessableEntityHttpException $e) {
-            return Response::jsonError([], $e->getMessage(), StatusCodeEnum::UNPROCESSABLE_ENTITY);
-        });
+    protected function jsonError(string $message, int $statusCode)
+    {
+        return Response::jsonError([], $message, $statusCode);
     }
 }
