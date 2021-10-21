@@ -201,4 +201,40 @@ class PostsTest extends TestCase
         $this->assertEquals($post->title, $param['title']);
         $this->assertEquals($post->body, $param['body']);
     }
+
+    /** @test */
+    public function delete_single_post_non_signin_user(): void
+    {
+        $post = Post::factory()->create();
+
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}"))
+            ->assertForbidden();
+
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_post_non_authorized_user(): void
+    {
+        $this->createSigninUser();
+        $post = Post::factory()->create();
+
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}"))
+            ->assertForbidden();
+
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_post(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create(['user_id' => $user]);
+
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}"))
+            ->assertOk();
+
+        $this->assertSuccessJsonResponse($response);
+        $this->assertNull($post->fresh());
+    }
 }

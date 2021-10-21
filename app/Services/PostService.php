@@ -52,4 +52,15 @@ class PostService
     {
         return $post->update($data);
     }
+
+    /**
+     * Delete Post
+     * 
+     * @param Post $post
+     * @return bool
+     */
+    public function delete(Post $post): bool
+    {
+        return $post->delete();
+    }
 }

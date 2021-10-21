@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Posts\PostStoreRequest;
-use App\Http\Requests\Posts\PostUpdateRequest;
 use App\Models\Post;
 use App\Services\PostService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Posts\PostStoreRequest;
+use App\Http\Requests\Posts\PostUpdateRequest;
+use App\Http\Requests\Posts\PostDestroyRequest;
 
 class PostController extends Controller
 {
@@ -59,10 +60,24 @@ class PostController extends Controller
         return Response::jsonSuccess(['post' => $post]);
     }
 
+    /**
+     * Update post
+     * 
+     * @param PostUpdateRequest $request
+     * @param Post $post
+     * @return JsonResponse
+     */
     public function update(PostUpdateRequest $request, Post $post): JsonResponse
     {
         $this->postService->update($post, $request->validated());
 
         return Response::jsonSuccess(['post' => $post]);
+    }
+
+    public function destroy(PostDestroyRequest $request, Post $post): JsonResponse
+    {
+        $this->postService->delete($post);
+
+        return Response::jsonSuccess([], 'Successfully deleted Post.');
     }
 }
