@@ -44,7 +44,7 @@ class PostController extends Controller
      */
     public function show(Post $post): JsonResponse
     {
-        return Response::jsonSuccess(['post' => $post]);
+        return Response::jsonSuccess(['post' => $post->load('user')]);
     }
 
     /**
