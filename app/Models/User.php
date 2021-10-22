@@ -106,14 +106,4 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => $this->freshTimestamp(),
         ])->save();
     }
-
-    /**
-     * Generate user token
-     * 
-     * @return string
-     */
-    public function generateToken(): string
-    {
-        return $this->createToken(config('app.name'))->plainTextToken;
-    }
 }

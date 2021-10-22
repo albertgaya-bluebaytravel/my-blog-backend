@@ -29,7 +29,7 @@ class PostController extends Controller
     {
         $query = Post::query()
             ->with('user')
-            ->orderBy('id', 'desc');
+            ->orderByDesc('id');
 
         $posts = $this->postService->all($query);
 
