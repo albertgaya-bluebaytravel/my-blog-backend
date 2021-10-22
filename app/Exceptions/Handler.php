@@ -4,7 +4,9 @@ namespace App\Exceptions;
 
 use Throwable;
 use App\Enums\StatusCodeEnum;
+use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -32,6 +34,14 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
+    protected $overrideExceptions = [
+        NotFoundHttpException::class => StatusCodeEnum::NOT_FOUND,
+        UnprocessableEntityHttpException::class => StatusCodeEnum::UNPROCESSABLE_ENTITY,
+        AccessDeniedHttpException::class => StatusCodeEnum::FORBIDDEN,
+        AuthenticationException::class => StatusCodeEnum::UNAUTHORIZED
+    ];
+
+
     /**
      * Register the exception handling callbacks for the application.
      *
@@ -43,13 +53,12 @@ class Handler extends ExceptionHandler
             //
         });
 
-        $this->renderable(fn (NotFoundHttpException $e) => $this->jsonError($e->getMessage(), StatusCodeEnum::NOT_FOUND));
-        $this->renderable(fn (UnprocessableEntityHttpException $e) => $this->jsonError($e->getMessage(), StatusCodeEnum::UNPROCESSABLE_ENTITY));
-        $this->renderable(fn (AccessDeniedHttpException $e) => $this->jsonError($e->getMessage(), StatusCodeEnum::FORBIDDEN));
-    }
+        $this->renderable(function (Exception $e) {
+            $class = get_class($e);
 
-    protected function jsonError(string $message, int $statusCode)
-    {
-        return Response::jsonError([], $message, $statusCode);
+            if (!isset($this->overrideExceptions[$class])) return;
+
+            return Response::jsonError([], $e->getMessage(), $this->overrideExceptions[$class]);
+        });
     }
 }

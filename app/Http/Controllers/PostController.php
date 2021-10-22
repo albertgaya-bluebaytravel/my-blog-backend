@@ -74,6 +74,13 @@ class PostController extends Controller
         return Response::jsonSuccess(['post' => $post]);
     }
 
+    /**
+     * Delete post
+     * 
+     * @param PostDestroyRequest $request
+     * @param Post $post
+     * @return JsonResponse
+     */
     public function destroy(PostDestroyRequest $request, Post $post): JsonResponse
     {
         $this->postService->delete($post);

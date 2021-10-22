@@ -113,6 +113,15 @@ class PostsTest extends TestCase
     }
 
     /** @test */
+    public function post_posts_comments_non_signin_user(): void
+    {
+        $post = Post::factory()->create();
+        $response = $this->postJson($this->uri("/posts/{$post->id}/comments"))
+            ->assertUnauthorized();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
     public function post_posts_comments_required_parameters(): void
     {
         $this->createSigninUser();

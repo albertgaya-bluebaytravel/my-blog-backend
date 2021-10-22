@@ -17,6 +17,13 @@ class CommentController extends Controller
         $this->commentService = $commentService;
     }
 
+    /**
+     * Store Post Comment
+     * 
+     * @param CommentStoreRequest $request
+     * @param Post $post
+     * @return JsonResponse
+     */
     public function store(CommentStoreRequest $request, Post $post): JsonResponse
     {
         $comment = $this->commentService->store($request->validated(), $post);
