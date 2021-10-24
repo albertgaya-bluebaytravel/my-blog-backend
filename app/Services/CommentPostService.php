@@ -39,10 +39,8 @@ class CommentPostService
     public function store(array $data, Post $post, User $user): Comment
     {
         $comment = new Comment($data);
-        $comment->post_id = $post->id;
-        $comment->user_id = $user->id;
-        // $comment->post()->associate($post);
-        // $comment->user()->associate($user);
+        $comment->post()->associate($post);
+        $comment->user()->associate($user);
         $comment->save();
 
         return $comment;

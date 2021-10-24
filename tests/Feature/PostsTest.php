@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Comment;
 use Tests\TestCase;
 use App\Models\Post;
 use App\Models\User;
@@ -186,11 +187,13 @@ class PostsTest extends TestCase
     {
         $user = $this->createSigninUser();
         $post = Post::factory()->create(['user_id' => $user]);
+        $comment = Comment::factory()->create(['user_id' => $user, 'post_id' => $post]);
 
         $response = $this->deleteJson($this->uri("/posts/{$post->id}"))
             ->assertOk();
 
         $this->assertSuccessJsonResponse($response);
         $this->assertNull($post->fresh());
+        $this->assertNull($comment->fresh());
     }
 }
