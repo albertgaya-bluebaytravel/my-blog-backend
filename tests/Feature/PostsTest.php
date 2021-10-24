@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\DirectoryEnum;
+use App\Enums\DiskEnum;
 use Tests\TestCase;
 use App\Models\Post;
 use App\Models\User;
@@ -98,7 +99,7 @@ class PostsTest extends TestCase
     /** @test */
     public function post_posts(): void
     {
-        Storage::fake('public');
+        Storage::fake(DiskEnum::PUBLIC);
 
         $user = $this->createSigninUser();
         $param = $this->data();
@@ -118,7 +119,7 @@ class PostsTest extends TestCase
         $this->assertTrue($post->user->is($user));
         $this->assertCount(1, $user->posts);
 
-        Storage::disk('public')->assertExists('posts/' . $param['image']->hashName());
+        Storage::disk(DiskEnum::PUBLIC)->assertExists(DirectoryEnum::POSTS . '/' . $param['image']->hashName());
     }
 
     /** @test */
@@ -171,7 +172,7 @@ class PostsTest extends TestCase
         $this->assertEquals($post->body, $param['body']);
         $this->assertEquals(DirectoryEnum::POSTS . '/' . $param['image']->hashName(), $dataPost['image_url']);
 
-        Storage::disk('public')->assertExists(DirectoryEnum::POSTS . '/' . $param['image']->hashName());
+        Storage::disk(DiskEnum::PUBLIC)->assertExists(DirectoryEnum::POSTS . '/' . $param['image']->hashName());
     }
 
     /** @test */
