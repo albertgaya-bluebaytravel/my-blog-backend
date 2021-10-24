@@ -49,7 +49,9 @@ class PostsTest extends TestCase
         $this->assertSameSize($posts, $dataPosts);
 
         $dataPost = current($dataPosts);
-        $this->assertEquals($posts->last()->id, $dataPost['id']);
+        $post = $posts->last();
+        $this->assertEquals($post->id, $dataPost['id']);
+        $this->assertEquals($post->imageFullUrl, $dataPost['image_full_url']);
 
         $this->assertArrayHasKey('user', $dataPost);
         $dataUser = $dataPost['user'];

@@ -14,6 +14,17 @@ class Post extends Model
     use HasFactory;
 
     protected $guarded = [];
+    protected $appends = ['image_full_url'];
+
+    /**
+     * Get post image full url
+     * 
+     * @return string
+     */
+    public function getImageFullUrlAttribute(): string
+    {
+        return asset($this->image_url);
+    }
 
     /**
      * Get the user that owns the Post
