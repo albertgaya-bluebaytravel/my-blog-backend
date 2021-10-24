@@ -123,6 +123,16 @@ class PostsTest extends TestCase
     }
 
     /** @test */
+    public function post_posts_optional_parameters(): void
+    {
+        $this->createSigninUser();
+        $response = $this->postJson($this->uri('/posts'), ['image' => null] + $this->data())
+            ->assertOk();
+
+        $this->assertSuccessJsonResponse($response);
+    }
+
+    /** @test */
     public function patch_single_post_non_signin_user(): void
     {
         $post = Post::factory()->create();
@@ -173,6 +183,24 @@ class PostsTest extends TestCase
         $this->assertEquals(DirectoryEnum::POSTS . '/' . $param['image']->hashName(), $dataPost['image_url']);
 
         Storage::disk(DiskEnum::PUBLIC)->assertExists(DirectoryEnum::POSTS . '/' . $param['image']->hashName());
+    }
+
+    /** @test */
+    public function patch_signel_post_optional_parameters(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create(['user_id' => $user]);
+
+        $param = [
+            'title' => $this->faker->title,
+            'body' => $this->faker->paragraph
+        ];
+
+        $response = $this->patchJson($this->uri("/posts/{$post->id}"), $param)
+            ->assertOk();
+
+        $dataPost = $this->assertSuccessJsonResponse($response)['data']['post'];
+        $this->assertNotNull($dataPost['image_url']);
     }
 
     /** @test */

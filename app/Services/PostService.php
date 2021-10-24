@@ -19,12 +19,11 @@ class PostService
      */
     protected function uploadImage(array &$data): void
     {
-        if (!$data['image']) return;
+        if (isset($data['image'])) {
+            $data['image_url'] = $data['image']->store(DirectoryEnum::POSTS, DiskEnum::PUBLIC);
+        }
 
-        $image = $data['image'];
         unset($data['image']);
-
-        $data['image_url'] = $image->store(DirectoryEnum::POSTS, DiskEnum::PUBLIC);
     }
 
     /**
