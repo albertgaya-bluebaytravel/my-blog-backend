@@ -10,6 +10,22 @@ use Illuminate\Database\Eloquent\Collection;
 class PostService
 {
     /**
+     * Upload Post image
+     * 
+     * @param array &$data
+     * @return void
+     */
+    protected function uploadImage(array &$data): void
+    {
+        if (!$data['image']) return;
+
+        $image = $data['image'];
+        unset($data['image']);
+
+        $data['image_url'] = $image->store('posts', 'public');
+    }
+
+    /**
      * List of Post
      * 
      * @param Builder $query
@@ -33,6 +49,8 @@ class PostService
      */
     public function store(array $data, User $user): Post
     {
+        $this->uploadImage($data);
+
         $post = new Post($data);
         $post->user_id = $user->id;
         $post->save();
@@ -49,6 +67,8 @@ class PostService
      */
     public function update(Post $post, array $data): bool
     {
+        $this->uploadImage($data);
+
         return $post->update($data);
     }
 

@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\Comment;
 use Tests\TestCase;
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Comment;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -25,6 +27,7 @@ class PostsTest extends TestCase
         return $override + [
             'title' => $this->faker->title,
             'body' => $this->faker->paragraph,
+            'image' => UploadedFile::fake()->image('post.jpg')
         ];
     }
 
@@ -92,6 +95,8 @@ class PostsTest extends TestCase
     /** @test */
     public function post_posts(): void
     {
+        Storage::fake('public');
+
         $user = $this->createSigninUser();
         $param = $this->data();
         $response = $this->postJson($this->uri('/posts'), $param)
@@ -102,14 +107,15 @@ class PostsTest extends TestCase
         $this->assertArrayHasKey('post', $data);
         $dataPost = $data['post'];
 
-        $post = Post::find($dataPost['id']);
-        $this->assertNotNull($user);
-
         $this->assertEquals($param['title'], $dataPost['title']);
         $this->assertEquals($param['body'], $dataPost['body']);
+        $this->assertEquals('posts/' . $param['image']->hashName(), $dataPost['image_url']);
 
+        $post = Post::find($dataPost['id']);
         $this->assertTrue($post->user->is($user));
         $this->assertCount(1, $user->posts);
+
+        Storage::disk('public')->assertExists('posts/' . $param['image']->hashName());
     }
 
     /** @test */
@@ -138,12 +144,15 @@ class PostsTest extends TestCase
     /** @test */
     public function patch_single_post(): void
     {
+        Storage::fake('public');
+
         $user = $this->createSigninUser();
         $post = Post::factory()->create(['user_id' => $user]);
 
         $param = [
             'title' => $this->faker->title,
             'body' => $this->faker->paragraph,
+            'image' => UploadedFile::fake()->image('post_updated.jpg')
         ];
 
         $response = $this->patchJson($this->uri("/posts/{$post->id}"), $param)
@@ -157,6 +166,9 @@ class PostsTest extends TestCase
         $this->assertEquals($post->id, $dataPost['id']);
         $this->assertEquals($post->title, $param['title']);
         $this->assertEquals($post->body, $param['body']);
+        $this->assertEquals('posts/' . $param['image']->hashName(), $dataPost['image_url']);
+
+        Storage::disk('public')->assertExists('posts/' . $param['image']->hashName());
     }
 
     /** @test */
