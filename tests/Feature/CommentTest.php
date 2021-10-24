@@ -14,7 +14,7 @@ class CommentTest extends TestCase
     use RefreshDatabase, WithFaker;
 
     /** @test */
-    public function get_single_post_comments(): void
+    public function get_comments_single_post(): void
     {
         $post = Post::factory()->create();
         $comments = Comment::factory()->count(10)->create(['post_id' => $post]);
@@ -32,10 +32,14 @@ class CommentTest extends TestCase
         $dataComment = current($dataComments);
         $this->assertEquals($comments->last()->id, $dataComment['id']);
         $this->assertEquals($post->id, $dataComment['post_id']);
+
+        $this->assertArrayHasKey('user', $dataComment);
+        $dataCommentUser = $dataComment['user'];
+        $this->assertEquals($comments->last()->user->id, $dataCommentUser['id']);
     }
 
     /** @test */
-    public function post_posts_comments_non_signin_user(): void
+    public function post_comments_single_post_non_signin_user(): void
     {
         $post = Post::factory()->create();
         $response = $this->postJson($this->uri("/comments/posts/{$post->id}"))
@@ -44,7 +48,7 @@ class CommentTest extends TestCase
     }
 
     /** @test */
-    public function post_posts_comments_required_parameters(): void
+    public function post_comments_single_post_required_parameters(): void
     {
         $this->createSigninUser();
         $post = Post::factory()->create();
@@ -57,7 +61,7 @@ class CommentTest extends TestCase
     }
 
     /** @test */
-    public function post_posts_comments_invalid_post(): void
+    public function post_comments_single_post_invalid_post(): void
     {
         $this->createSigninUser();
         $this->postJson($this->uri('/posts/comments/123'))
@@ -65,9 +69,9 @@ class CommentTest extends TestCase
     }
 
     /** @test */
-    public function post_posts_comments(): void
+    public function post_comments_single_post(): void
     {
-        $this->createSigninUser();
+        $user = $this->createSigninUser();
         $post = Post::factory()->create();
         $param = ['body' => $this->faker->paragraph];
         $response = $this->postJson($this->uri("/comments/posts/{$post->id}"), $param)
@@ -77,13 +81,9 @@ class CommentTest extends TestCase
 
         $this->assertArrayHasKey('comment', $data);
         $dataComment = $data['comment'];
-
-        $comment = Comment::find($dataComment['id']);
-        $this->assertNotNull($comment);
-
         $this->assertEquals($param['body'], $dataComment['body']);
 
-        $this->assertTrue($comment->post->is($post));
         $this->assertCount(1, $post->comments);
+        $this->assertTrue($user->is($post->comments->first()->user));
     }
 }

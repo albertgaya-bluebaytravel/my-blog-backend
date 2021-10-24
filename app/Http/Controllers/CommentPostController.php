@@ -8,6 +8,7 @@ use App\Services\CommentPostService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\Comments\CommentStoreRequest;
 use App\Models\Comment;
+use Illuminate\Support\Facades\Auth;
 
 class CommentPostController extends Controller
 {
@@ -27,6 +28,7 @@ class CommentPostController extends Controller
     public function show(Post $post): JsonResponse
     {
         $query = Comment::query()
+            ->with('user')
             ->orderByDesc('id');
 
         $comments = $this->commentPostService->show($query, $post);
@@ -43,7 +45,7 @@ class CommentPostController extends Controller
      */
     public function store(CommentStoreRequest $request, Post $post): JsonResponse
     {
-        $comment = $this->commentPostService->store($request->validated(), $post);
+        $comment = $this->commentPostService->store($request->validated(), $post, Auth::user());
 
         return Response::jsonSuccess(['comment' => $comment]);
     }
