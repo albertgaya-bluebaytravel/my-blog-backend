@@ -22,10 +22,15 @@ class PostFactory extends Factory
      */
     public function definition()
     {
+        $createdAt = $this->faker->dateTimeBetween('-1 years', 'now');
+        $updatedAt = $createdAt;
+
         return [
-            'title' => $this->faker->title,
-            'body' => $this->faker->paragraph,
-            'user_id' => User::factory()
+            'title' => $this->faker->sentence(),
+            'body' => $this->faker->paragraph(),
+            'user_id' => User::factory()->verified(),
+            'created_at' => $createdAt,
+            'updated_at' => $updatedAt
         ];
     }
 }
