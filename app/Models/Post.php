@@ -23,7 +23,7 @@ class Post extends Model
      */
     public function getImageFullUrlAttribute(): string
     {
-        return asset('storage/' . $this->image_url);
+        return $this->image_url ? asset('storage/' . $this->image_url) : '';
     }
 
     /**

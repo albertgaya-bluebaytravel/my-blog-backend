@@ -77,6 +77,19 @@ class PostsTest extends TestCase
     }
 
     /** @test */
+    public function get_single_post_without_image(): void
+    {
+        $post = Post::factory()->create(['image_url' => null]);
+
+        $response = $this->getJson($this->uri("/posts/{$post->id}"))
+            ->assertOk();
+
+        $dataPost = $this->assertSuccessJsonResponse($response)['data']['post'];
+        $this->assertEmpty($dataPost['image_full_url']);
+    }
+
+
+    /** @test */
     public function post_posts_non_authorized_user(): void
     {
         $this->postJson($this->uri('/posts'))
