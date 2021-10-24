@@ -27,7 +27,7 @@ class PostUpdateRequest extends FormRequest
         return [
             'title' => ['string', 'max:255'],
             'body' => ['string'],
-            'image' => ['image']
+            'image' => ['nullable', 'image']
         ];
     }
 }

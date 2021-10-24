@@ -123,7 +123,7 @@ class PostsTest extends TestCase
     }
 
     /** @test */
-    public function post_posts_optional_parameters(): void
+    public function post_posts_image_as_null(): void
     {
         $this->createSigninUser();
         $response = $this->postJson($this->uri('/posts'), ['image' => null] + $this->data())
@@ -186,14 +186,15 @@ class PostsTest extends TestCase
     }
 
     /** @test */
-    public function patch_signel_post_optional_parameters(): void
+    public function patch_signel_post_image_as_null(): void
     {
         $user = $this->createSigninUser();
         $post = Post::factory()->create(['user_id' => $user]);
 
         $param = [
             'title' => $this->faker->title,
-            'body' => $this->faker->paragraph
+            'body' => $this->faker->paragraph,
+            'image' => null
         ];
 
         $response = $this->patchJson($this->uri("/posts/{$post->id}"), $param)
