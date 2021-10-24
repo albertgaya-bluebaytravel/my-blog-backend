@@ -29,6 +29,7 @@ class PostFactory extends Factory
             'title' => $this->faker->sentence(),
             'body' => $this->faker->paragraph(),
             'user_id' => User::factory()->verified(),
+            'image_url' => 'posts/default.jpg',
             'created_at' => $createdAt,
             'updated_at' => $updatedAt
         ];

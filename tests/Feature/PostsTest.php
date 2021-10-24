@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\DirectoryEnum;
 use Tests\TestCase;
 use App\Models\Post;
 use App\Models\User;
@@ -109,7 +110,7 @@ class PostsTest extends TestCase
 
         $this->assertEquals($param['title'], $dataPost['title']);
         $this->assertEquals($param['body'], $dataPost['body']);
-        $this->assertEquals('posts/' . $param['image']->hashName(), $dataPost['image_url']);
+        $this->assertEquals(DirectoryEnum::POSTS . '/' . $param['image']->hashName(), $dataPost['image_url']);
 
         $post = Post::find($dataPost['id']);
         $this->assertTrue($post->user->is($user));
@@ -166,9 +167,9 @@ class PostsTest extends TestCase
         $this->assertEquals($post->id, $dataPost['id']);
         $this->assertEquals($post->title, $param['title']);
         $this->assertEquals($post->body, $param['body']);
-        $this->assertEquals('posts/' . $param['image']->hashName(), $dataPost['image_url']);
+        $this->assertEquals(DirectoryEnum::POSTS . '/' . $param['image']->hashName(), $dataPost['image_url']);
 
-        Storage::disk('public')->assertExists('posts/' . $param['image']->hashName());
+        Storage::disk('public')->assertExists(DirectoryEnum::POSTS . '/' . $param['image']->hashName());
     }
 
     /** @test */

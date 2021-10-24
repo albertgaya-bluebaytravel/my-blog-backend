@@ -28,9 +28,9 @@ class UserServiceTest extends TestCase
     protected function storeData(): array
     {
         return [
-            'name' => $this->faker->name,
-            'email' => $this->faker->email,
-            'password' => $this->faker->password
+            'name' => $this->faker->name(),
+            'email' => $this->faker->email(),
+            'password' => $this->faker->password()
         ];
     }
 

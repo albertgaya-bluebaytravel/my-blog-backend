@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Enums\DiskEnum;
+use App\Enums\DirectoryEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -22,7 +24,7 @@ class PostService
         $image = $data['image'];
         unset($data['image']);
 
-        $data['image_url'] = $image->store('posts', 'public');
+        $data['image_url'] = $image->store(DirectoryEnum::POSTS, DiskEnum::PUBLIC);
     }
 
     /**
