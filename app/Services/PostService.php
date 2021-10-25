@@ -68,6 +68,13 @@ class PostService
      */
     public function update(Post $post, array $data): bool
     {
+        if (isset($data['image_remove']) && $data['image_remove']) {
+            unset($data['image'], $data['image_remove']);
+            $data['image_url'] = null;
+        } else {
+            $this->uploadImage($data);
+        }
+
         $this->uploadImage($data);
 
         return $post->update($data);

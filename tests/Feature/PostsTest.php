@@ -189,17 +189,18 @@ class PostsTest extends TestCase
 
         $this->assertArrayHasKey('post', $data);
         $dataPost = $data['post'];
+        $this->assertNotEquals($post->image_url, $dataPost['image_url']);
+
         $post->refresh();
         $this->assertEquals($post->id, $dataPost['id']);
         $this->assertEquals($post->title, $param['title']);
         $this->assertEquals($post->body, $param['body']);
-        $this->assertEquals(DirectoryEnum::POSTS . '/' . $param['image']->hashName(), $dataPost['image_url']);
 
         Storage::disk(DiskEnum::PUBLIC)->assertExists(DirectoryEnum::POSTS . '/' . $param['image']->hashName());
     }
 
     /** @test */
-    public function patch_signel_post_image_as_null(): void
+    public function patch_single_post_image_as_null(): void
     {
         $user = $this->createSigninUser();
         $post = Post::factory()->create(['user_id' => $user]);
@@ -215,6 +216,28 @@ class PostsTest extends TestCase
 
         $dataPost = $this->assertSuccessJsonResponse($response)['data']['post'];
         $this->assertNotNull($dataPost['image_url']);
+        $this->assertNotNull($dataPost['image_full_url']);
+    }
+
+    /** @test */
+    public function patch_single_post_remove_image(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create(['user_id' => $user]);
+
+        $param = [
+            'title' => $this->faker->title,
+            'body' => $this->faker->paragraph,
+            'image' => null,
+            'image_remove' => true
+        ];
+
+        $response = $this->patchJson($this->uri("/posts/{$post->id}"), $param)
+            ->assertOk();
+
+        $dataPost = $this->assertSuccessJsonResponse($response)['data']['post'];
+        $this->assertNull($dataPost['image_url']);
+        $this->assertEmpty($dataPost['image_full_url']);
     }
 
     /** @test */
