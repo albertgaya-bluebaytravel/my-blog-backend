@@ -17,4 +17,15 @@ class CommentService
     {
         return $comment->update($data);
     }
+
+    /**
+     * Delete comment
+     * 
+     * @param Comment $coment
+     * @return bool
+     */
+    public function delete(Comment $comment): bool
+    {
+        return $comment->delete();
+    }
 }

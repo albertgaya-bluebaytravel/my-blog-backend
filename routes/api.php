@@ -40,6 +40,7 @@ Route::prefix('/comments')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/{comment}', [CommentController::class, 'update']);
+        Route::delete('/{comment}', [CommentController::class, 'destroy']);
         Route::post('/posts/{post}', [CommentPostController::class, 'store']);
     });
 });

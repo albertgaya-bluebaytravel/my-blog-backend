@@ -48,4 +48,36 @@ class CommentsTest extends TestCase
         $dataComment = $data['comment'];
         $this->assertEquals($param['body'], $dataComment['body']);
     }
+
+    /** @test */
+    public function delete_single_comment_non_signin_user(): void
+    {
+        $comment = Comment::factory()->create();
+        $response = $this->deleteJson($this->uri("/comments/{$comment->id}"))
+            ->assertUnauthorized();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_comment_non_owner_user(): void
+    {
+        $this->createSigninUser();
+        $comment = Comment::factory()->create();
+        $response = $this->deleteJson($this->uri("/comments/{$comment->id}"))
+            ->assertForbidden();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_comment(): void
+    {
+        $user = $this->createSigninUser();
+        $comment = Comment::factory()->create(['user_id' => $user]);
+
+        $response = $this->deleteJson($this->uri("/comments/{$comment->id}"))
+            ->assertOk();
+
+        $this->assertSuccessJsonResponse($response);
+        $this->assertNull($comment->fresh());
+    }
 }
