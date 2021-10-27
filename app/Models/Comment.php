@@ -17,7 +17,7 @@ class Comment extends Model
     /**
      * Get the post that owns the Comment
      *
-     * @return elongsTo
+     * @return BelongsTo
      */
     public function post(): BelongsTo
     {
@@ -27,10 +27,20 @@ class Comment extends Model
     /**
      * Get the user that owns the Comment
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the parent that owns the Comment
+     *
+     * @return BelongsTo
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Comment::class, 'id', 'comment_id');
     }
 }
