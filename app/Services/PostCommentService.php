@@ -5,19 +5,27 @@ namespace App\Services;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
+use App\Services\CommentService;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 
 class PostCommentService
 {
+    protected CommentService $commentService;
+
+    public function __construct(CommentService $commentService)
+    {
+        $this->commentService = $commentService;
+    }
+
     /**
-     * Show a post comments
+     * All post comments
      * 
      * @param Builder $query
      * @param Post $post
      * @return Collection
      */
-    public function show(Builder $query = null, Post $post): Collection
+    public function all(Builder $query = null, Post $post): Collection
     {
         if (!$query) {
             $query = Comment::query();
@@ -25,7 +33,7 @@ class PostCommentService
 
         $query->whereBelongsTo($post);
 
-        return $query->get();
+        return $this->commentService->all($query);
     }
 
     /**
@@ -38,11 +46,8 @@ class PostCommentService
      */
     public function store(array $data, Post $post, User $user): Comment
     {
-        $comment = new Comment($data);
-        $comment->post()->associate($post);
-        $comment->user()->associate($user);
-        $comment->save();
+        $data['post_id'] = $post->id;
 
-        return $comment;
+        return $this->commentService->store($data, $user);
     }
 }

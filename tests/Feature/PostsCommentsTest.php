@@ -64,7 +64,7 @@ class PostsCommentsTest extends TestCase
     public function post_single_post_comments_invalid_post(): void
     {
         $this->createSigninUser();
-        $this->postJson($this->uri('/comments/123/posts'))
+        $this->postJson($this->uri("/posts/123/comments"))
             ->assertNotFound();
     }
 
@@ -88,74 +88,104 @@ class PostsCommentsTest extends TestCase
     }
 
     /** @test */
-    public function post_single_post_single_comment_reply_non_signin_user(): void
+    public function patch_single_post_single_comment_non_singin_user(): void
     {
         $post = Post::factory()->create();
-        $comment = Comment::factory()->create(['post_id' => $post]);
-        $response = $this->postJson($this->uri("/posts/{$post->id}/comments/{$comment->id}/reply"))
+        $comment = Comment::factory()->create();
+        $response = $this->patchJson($this->uri("/posts/{$post->id}/comments/{$comment->id}"))
             ->assertUnauthorized();
         $this->assertErrorJsonResponse($response);
     }
 
     /** @test */
-    public function post_single_post_single_comment_reply_required_parameters(): void
-    {
-        $this->createSigninUser();
-        $post = Post::factory()->create();
-        $comment = Comment::factory()->create(['post_id' => $post]);
-        $response = $this->postJson($this->uri("/posts/{$post->id}/comments/{$comment->id}/reply"))
-            ->assertUnprocessable();
-
-        $errors = $this->assertErrorJsonResponse($response)['errors'];
-        $this->assertCount(1, $errors);
-        $this->assertArrayHasKey('body', $errors);
-    }
-
-    /** @test */
-    public function post_single_post_single_comment_reply_invalid_post(): void
-    {
-        $this->createSigninUser();
-        $comment = Comment::factory()->create();
-        $this->postJson($this->uri("/posts/123/comments/{$comment->id}/reply"))
-            ->assertNotFound();
-    }
-
-    /** @test */
-    public function post_single_post_single_comment_reply_invalid_comment(): void
-    {
-        $this->createSigninUser();
-        $post = Post::factory()->create();
-        $this->postJson($this->uri("/posts/{$post->id}/comments/123/reply"))
-            ->assertNotFound();
-    }
-
-    /** @test */
-    public function post_single_post_single_comment_reply_non_related_post_and_comment(): void
+    public function patch_singel_post_single_comment_non_owner_user(): void
     {
         $this->createSigninUser();
         $post = Post::factory()->create();
         $comment = Comment::factory()->create();
-        $this->postJson($this->uri("/posts/{$post->id}/comments/{$comment->id}/reply"))
-            ->assertNotFound();
+        $response = $this->patchJson($this->uri("/posts/{$post->id}/comments/{$comment->id}"))
+            ->assertForbidden();
+        $this->assertErrorJsonResponse($response);
     }
 
     /** @test */
-    public function post_single_post_single_comment_reply(): void
+    public function patch_single_post_single_comment_non_related_post_and_comment(): void
     {
         $user = $this->createSigninUser();
         $post = Post::factory()->create();
-        $comment = Comment::factory()->create(['post_id' => $post]);
+        $comment = Comment::factory()->create(['user_id' => $user]);
+        $response = $this->patchJson($this->uri("/posts/{$post->id}/comments/{$comment->id}"))
+            ->assertNotFound();
+        $this->assertErrorJsonResponse($response);
+    }
+    /** @test */
+    public function patch_single_post_single_comment(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create([
+            'post_id' => $post,
+            'user_id' => $user
+        ]);
 
-        $param = ['body' => $this->faker->paragraph()];
+        $param = ['body' => $this->faker->sentence()];
 
-        $response = $this->postJson($this->uri("/posts/{$post->id}/comments/{$comment->id}/reply"), $param)
+        $response = $this->patchJson($this->uri("/posts/{$post->id}/comments/{$comment->id}"), $param)
             ->assertOk();
 
         $data = $this->assertSuccessJsonResponse($response)['data'];
 
         $this->assertArrayHasKey('comment', $data);
         $dataComment = $data['comment'];
-        $this->assertEquals($comment->id, $dataComment['parent']['id']);
-        $this->assertEquals($user->id, $dataComment['user']['id']);
+        $this->assertEquals($param['body'], $dataComment['body']);
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment_non_signin_user(): void
+    {
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create();
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}/comments/{$comment->id}"))
+            ->assertUnauthorized();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment_non_owner_user(): void
+    {
+        $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create();
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}/comments/{$comment->id}"))
+            ->assertForbidden();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment_non_related_post_and_comment(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create(['user_id' => $user]);
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}/comments/{$comment->id}"))
+            ->assertNotFound();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create([
+            'post_id' => $post,
+            'user_id' => $user
+        ]);
+
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}/comments/{$comment->id}"))
+            ->assertOk();
+
+        $this->assertSuccessJsonResponse($response);
+        $this->assertNull($comment->fresh());
     }
 }

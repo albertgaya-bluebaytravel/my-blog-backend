@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Http\Requests\Comments;
+namespace App\Http\Requests\Posts;
 
+use App\traits\requests\PostCommentRequestTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CommentUpdateRequest extends FormRequest
+class PostCommentDestroyRequest extends FormRequest
 {
+    use PostCommentRequestTrait;
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -24,8 +27,6 @@ class CommentUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'body' => ['string']
-        ];
+        return [];
     }
 }
