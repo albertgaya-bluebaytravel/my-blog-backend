@@ -8,8 +8,8 @@ use App\Models\Comment;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-/** @group CommentTest */
-class CommentTest extends TestCase
+/** @group CommentsPostTest */
+class CommentsPostTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 

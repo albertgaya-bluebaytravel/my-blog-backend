@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CommentPostController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
@@ -38,6 +39,7 @@ Route::prefix('/comments')->group(function () {
     Route::get('/posts/{post}', [CommentPostController::class, 'show']);
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::patch('/{comment}', [CommentController::class, 'update']);
         Route::post('/posts/{post}', [CommentPostController::class, 'store']);
     });
 });
