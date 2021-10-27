@@ -3,12 +3,12 @@
 namespace App\Services;
 
 use App\Models\Post;
-use App\Models\Comment;
 use App\Models\User;
+use App\Models\Comment;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
 
-class CommentPostService
+class PostCommentService
 {
     /**
      * Show a post comments

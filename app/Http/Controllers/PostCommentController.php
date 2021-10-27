@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use Illuminate\Http\Response;
-use App\Services\CommentPostService;
-use Illuminate\Http\JsonResponse;
-use App\Http\Requests\Comments\CommentStoreRequest;
 use App\Models\Comment;
+use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
+use App\Services\PostCommentService;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Posts\PostCommentStoreRequest;
 
-class CommentPostController extends Controller
+class PostCommentController extends Controller
 {
-    protected CommentPostService $commentPostService;
+    protected PostCommentService $postCommentService;
 
-    public function __construct(CommentPostService $commentPostService)
+    public function __construct(PostCommentService $postCommentService)
     {
-        $this->commentPostService = $commentPostService;
+        $this->postCommentService = $postCommentService;
     }
 
     /**
@@ -31,7 +31,7 @@ class CommentPostController extends Controller
             ->with('user')
             ->orderByDesc('id');
 
-        $comments = $this->commentPostService->show($query, $post);
+        $comments = $this->postCommentService->show($query, $post);
 
         return Response::jsonSuccess(['comments' => $comments]);
     }
@@ -39,13 +39,13 @@ class CommentPostController extends Controller
     /**
      * Store Post Comment
      * 
-     * @param CommentStoreRequest $request
+     * @param PostCommentStoreRequest $request
      * @param Post $post
      * @return JsonResponse
      */
-    public function store(CommentStoreRequest $request, Post $post): JsonResponse
+    public function store(PostCommentStoreRequest $request, Post $post): JsonResponse
     {
-        $comment = $this->commentPostService->store($request->validated(), $post, Auth::user());
+        $comment = $this->postCommentService->store($request->validated(), $post, Auth::user());
 
         return Response::jsonSuccess(['comment' => $comment]);
     }

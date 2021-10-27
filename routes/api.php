@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\CommentController;
-use App\Http\Controllers\CommentPostController;
+use App\Http\Controllers\PostCommentController;
+use App\Http\Controllers\PostCommentReplyController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -29,18 +30,18 @@ Route::prefix('/posts')->group(function () {
     Route::get('/{post}', [PostController::class, 'show']);
     Route::patch('/{post}', [PostController::class, 'update']);
     Route::delete('/{post}', [PostController::class, 'destroy']);
+    Route::get('/{post}/comments', [PostCommentController::class, 'show']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [PostController::class, 'store']);
+        Route::post('/{post}/comments', [PostCommentController::class, 'store']);
+        Route::post('/{post}/comments/{comment}/reply', [PostCommentReplyController::class, 'store']);
     });
 });
 
 Route::prefix('/comments')->group(function () {
-    Route::get('/posts/{post}', [CommentPostController::class, 'show']);
-
     Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/{comment}', [CommentController::class, 'update']);
         Route::delete('/{comment}', [CommentController::class, 'destroy']);
-        Route::post('/posts/{post}', [CommentPostController::class, 'store']);
     });
 });
