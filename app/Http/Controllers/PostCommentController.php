@@ -9,6 +9,7 @@ use App\Services\CommentService;
 use Illuminate\Http\JsonResponse;
 use App\Services\PostCommentService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Http\Requests\Posts\PostCommentStoreRequest;
 use App\Http\Requests\Posts\PostCommentUpdateRequest;
 use App\Http\Requests\Posts\PostCommentDestroyRequest;
@@ -34,7 +35,9 @@ class PostCommentController extends Controller
     {
         $query = Comment::query()
             ->with('user')
-            ->with('replies')
+            ->with('replies', function (HasMany $query) {
+                $query->with('user')->orderByDesc('id');
+            })
             ->doesntHave('parent')
             ->orderByDesc('id');
 

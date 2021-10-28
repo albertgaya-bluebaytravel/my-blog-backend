@@ -18,7 +18,7 @@ class PostsCommentsTest extends TestCase
     {
         $post = Post::factory()->create();
         $comments = Comment::factory()->count(10)->create(['post_id' => $post]);
-        $reply = Comment::factory()->create(['parent_id' => $comments->last()]);
+        $replies = Comment::factory()->count(10)->create(['parent_id' => $comments->last()]);
 
         $response = $this->getJson($this->uri("/posts/{$post->id}/comments"))
             ->assertOk();
@@ -34,16 +34,22 @@ class PostsCommentsTest extends TestCase
         $this->assertEquals($comments->last()->id, $dataComment['id']);
         $this->assertEquals($post->id, $dataComment['post_id']);
 
+        $comment = $comments->last();
         $this->assertArrayHasKey('user', $dataComment);
         $dataCommentUser = $dataComment['user'];
-        $this->assertEquals($comments->last()->user->id, $dataCommentUser['id']);
+        $this->assertEquals($comment->user->id, $dataCommentUser['id']);
 
         $this->assertArrayHasKey('replies', $dataComment);
         $dataCommentReplies = $dataComment['replies'];
-        $this->assertCount(1, $dataCommentReplies);
+        $this->assertSameSize($replies, $dataCommentReplies);
 
+        $reply = $replies->last();
         $dataCommentReply = current($dataCommentReplies);
         $this->assertEquals($reply->id, $dataCommentReply['id']);
+
+        $this->assertArrayHasKey('user', $dataCommentReply);
+        $dataCommentReplyUser = $dataCommentReply['user'];
+        $this->assertEquals($reply->user->id, $dataCommentReplyUser['id']);
     }
 
     /** @test */
