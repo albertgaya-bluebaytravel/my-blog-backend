@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class PostCommentReplyService
 {
@@ -26,5 +27,17 @@ class PostCommentReplyService
         $comment->save();
 
         return $comment;
+    }
+
+    /**
+     * Update post comment reply
+     * 
+     * @param array $data
+     * @param Comment $comment
+     * @return bool
+     */
+    public function update(array $data, Comment $comment): bool
+    {
+        return $comment->update($data);
     }
 }

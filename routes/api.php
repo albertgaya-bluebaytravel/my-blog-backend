@@ -36,6 +36,7 @@ Route::prefix('/posts')->group(function () {
         Route::post('/{post}/comments', [PostCommentController::class, 'store']);
         Route::patch('/{post}/comments/{comment}', [PostCommentController::class, 'update']);
         Route::delete('/{post}/comments/{comment}', [PostCommentController::class, 'destroy']);
-        Route::post('/{post}/comments/{comment}/reply', [PostCommentReplyController::class, 'store']);
+        Route::post('/{post}/comments/{comment}/replies', [PostCommentReplyController::class, 'store']);
+        Route::patch('/{post}/comments/{comment}/replies/{reply}', [PostCommentReplyController::class, 'update']);
     });
 });

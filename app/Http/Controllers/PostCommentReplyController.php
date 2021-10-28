@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Services\PostCommentReplyService;
 use App\Http\Requests\Posts\PostCommentReplyStoreRequest;
+use App\Http\Requests\Posts\PostCommentReplyUpdateRequest;
 
 class PostCommentReplyController extends Controller
 {
@@ -32,5 +33,12 @@ class PostCommentReplyController extends Controller
         $comment = $this->postCommentReplyService->store($request->validated(), $post, $comment, Auth::user());
 
         return Response::jsonSuccess(['comment' => $comment]);
+    }
+
+    public function update(PostCommentReplyUpdateRequest $request, Post $post, Comment $comment, Comment $reply): JsonResponse
+    {
+        $this->postCommentReplyService->update($request->validated(), $reply);
+
+        return Response::jsonSuccess(['comment' => $reply]);
     }
 }
