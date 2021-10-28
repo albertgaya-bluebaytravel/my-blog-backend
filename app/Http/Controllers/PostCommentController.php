@@ -34,6 +34,7 @@ class PostCommentController extends Controller
     {
         $query = Comment::query()
             ->with('user')
+            ->with('replies')
             ->doesntHave('parent')
             ->orderByDesc('id');
 
