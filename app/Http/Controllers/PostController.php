@@ -29,6 +29,7 @@ class PostController extends Controller
     {
         $query = Post::query()
             ->with('user')
+            ->with('comments')
             ->orderByDesc('id');
 
         $posts = $this->postService->all($query);

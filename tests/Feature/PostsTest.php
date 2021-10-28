@@ -57,6 +57,8 @@ class PostsTest extends TestCase
         $this->assertArrayHasKey('user', $dataPost);
         $dataUser = $dataPost['user'];
         $this->assertEquals($user->id, $dataUser['id']);
+
+        $this->assertArrayHasKey('comments', $dataPost);
     }
 
     /** @test */

@@ -41,6 +41,6 @@ class Comment extends Model
      */
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(Comment::class, 'id', 'comment_id');
+        return $this->belongsTo(Comment::class, 'parent_id');
     }
 }

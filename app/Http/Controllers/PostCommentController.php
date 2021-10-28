@@ -34,6 +34,7 @@ class PostCommentController extends Controller
     {
         $query = Comment::query()
             ->with('user')
+            ->doesntHave('parent')
             ->orderByDesc('id');
 
         $comments = $this->postCommentService->all($query, $post);
