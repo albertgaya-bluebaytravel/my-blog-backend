@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Comment;
-use phpDocumentor\Reflection\Types\Boolean;
 
 class PostCommentReplyService
 {
@@ -39,5 +38,16 @@ class PostCommentReplyService
     public function update(array $data, Comment $comment): bool
     {
         return $comment->update($data);
+    }
+
+    /**
+     * Delete post comment reply
+     * 
+     * @param Comment $comment
+     * @return bool
+     */
+    public function delete(Comment $comment): bool
+    {
+        return $comment->delete();
     }
 }

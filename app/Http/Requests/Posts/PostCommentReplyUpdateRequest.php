@@ -3,16 +3,12 @@
 namespace App\Http\Requests\Posts;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use App\traits\requests\PostCommentRequestTrait;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\traits\requests\PostCommentReplyRequestTrait;
 
 class PostCommentReplyUpdateRequest extends FormRequest
 {
-    use PostCommentRequestTrait {
-        withValidator as parentWithValidator;
-    }
+    use PostCommentReplyRequestTrait;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -34,22 +30,5 @@ class PostCommentReplyUpdateRequest extends FormRequest
         return [
             'body' => ['required', 'string']
         ];
-    }
-
-    /**
-     * Configure the validator instance.
-     *
-     * @param Validator $validator
-     * @return void
-     */
-    public function withValidator(Validator $validator): void
-    {
-        $this->parentWithValidator($validator);
-
-        $validator->after(function () {
-            if (!$this->comment->is($this->reply->parent)) {
-                throw new NotFoundHttpException('Unable to find comment data!');
-            }
-        });
     }
 }

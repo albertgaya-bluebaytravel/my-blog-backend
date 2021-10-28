@@ -200,4 +200,97 @@ class PostsCommentsReplyTest extends TestCase
         $this->assertEquals($post->id, $dataComment['post_id']);
         $this->assertEquals($comment->id, $dataComment['parent_id']);
     }
+
+    /** @test */
+    public function delete_single_post_single_comment_single_reply_non_signin_user(): void
+    {
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create(['post_id' => $post]);
+        $reply = Comment::factory()->create(['post_id' => $post, 'parent_id' => $comment]);
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}/comments/{$comment->id}/replies/{$reply->id}"))
+            ->assertUnauthorized();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment_single_reply_non_owner_user(): void
+    {
+        $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create(['post_id' => $post]);
+        $reply = Comment::factory()->create(['post_id' => $post, 'parent_id' => $comment]);
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}/comments/{$comment->id}/replies/{$reply->id}"))
+            ->assertForbidden();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment_single_reply_invalid_post(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create(['post_id' => $post]);
+        $reply = Comment::factory()->create(['post_id' => $post, 'parent_id' => $comment, 'user_id' => $user]);
+        $this->deleteJson($this->uri("/posts/123/comments/{$comment->id}/replies/{$reply->id}"))
+            ->assertNotFound();
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment_single_reply_invalid_comment(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create(['post_id' => $post]);
+        $reply = Comment::factory()->create(['post_id' => $post, 'parent_id' => $comment, 'user_id' => $user]);
+        $this->deleteJson($this->uri("/posts/{$post->id}/comments/123/replies/{$reply->id}"))
+            ->assertNotFound();
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment_single_reply_invalid_reply(): void
+    {
+        $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create(['post_id' => $post]);
+        $this->deleteJson($this->uri("/posts/{$post->id}/comments/{$comment->id}/replies/123"))
+            ->assertNotFound();
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment_single_reply_non_related_post_and_comment(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create();
+        $reply = Comment::factory()->create(['post_id' => $post, 'parent_id' => $comment, 'user_id' => $user]);
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}/comments/{$comment->id}/replies/{$reply->id}"))
+            ->assertNotFound();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment_single_reply_non_related_comment_and_reply(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create(['post_id' => $post]);
+        $reply = Comment::factory()->create(['post_id' => $post, 'parent_id' => Comment::factory(), 'user_id' => $user]);
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}/comments/{$comment->id}/replies/{$reply->id}"))
+            ->assertNotFound();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function delete_single_post_single_comment_single_reply(): void
+    {
+        $user = $this->createSigninUser();
+        $post = Post::factory()->create();
+        $comment = Comment::factory()->create(['post_id' => $post]);
+        $reply = Comment::factory()->create(['post_id' => $post, 'parent_id' => $comment, 'user_id' => $user]);
+        $response = $this->deleteJson($this->uri("/posts/{$post->id}/comments/{$comment->id}/replies/{$reply->id}"))
+            ->assertOk();
+
+        $this->assertSuccessJsonResponse($response);
+        $this->assertNull($reply->fresh());
+    }
 }

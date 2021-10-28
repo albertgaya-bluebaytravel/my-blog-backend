@@ -2,13 +2,13 @@
 
 namespace App\Http\Requests\Posts;
 
-use App\traits\requests\PostCommentRequestTrait;
+use App\traits\requests\PostCommentReplyRequestTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PostCommentDestroyRequest extends FormRequest
 {
-    use PostCommentRequestTrait;
+    use PostCommentReplyRequestTrait;
 
     /**
      * Determine if the user is authorized to make this request.

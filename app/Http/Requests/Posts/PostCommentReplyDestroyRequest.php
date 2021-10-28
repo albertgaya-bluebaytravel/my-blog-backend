@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\Posts;
 
-use App\traits\requests\PostCommentReplyRequestTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
+use App\traits\requests\PostCommentReplyRequestTrait;
 
-class PostCommentUpdateRequest extends FormRequest
+class PostCommentReplyDestroyRequest extends FormRequest
 {
     use PostCommentReplyRequestTrait;
 
@@ -17,7 +17,7 @@ class PostCommentUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::check() && $this->comment->user->is(Auth::user());
+        return Auth::check() && $this->reply->user->is(Auth::user());
     }
 
     /**
@@ -27,8 +27,6 @@ class PostCommentUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'body' => ['string']
-        ];
+        return [];
     }
 }
