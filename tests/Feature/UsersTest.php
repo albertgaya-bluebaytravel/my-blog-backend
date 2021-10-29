@@ -281,4 +281,15 @@ class UsersTest extends TestCase
         $data = $this->assertSuccessJsonResponse($response)['data'];
         $this->assertTrue($data);
     }
+
+    /** @test */
+    public function post_users_unique_email_non_existing_exception(): void
+    {
+        $user = User::factory()->create();
+        $response = $this->postJson($this->uri("users/unique/email"), ['email' => $user->email, 'id' => $user->id])
+            ->assertOk();
+
+        $data = $this->assertSuccessJsonResponse($response)['data'];
+        $this->assertTrue($data);
+    }
 }

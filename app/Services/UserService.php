@@ -92,10 +92,15 @@ class UserService
      * Check if email is unique
      * 
      * @param string $email
+     * @param int $id
      * @param bool
      */
-    public function isUniqueEmail(string $email): bool
+    public function isUniqueEmail(string $email, int $id = null): bool
     {
-        return !User::where('email', $email)->exists();
+        return !User::where('email', $email)
+            ->when($id, function ($query, $id) {
+                return $query->where('id', '!=', $id);
+            })
+            ->exists();
     }
 }

@@ -91,7 +91,7 @@ class UserController extends Controller
      */
     public function isUniqueEmail(UserUniqueProfileRequest $request): JsonResponse
     {
-        $isUnique = $this->userService->isUniqueEmail($request->get('email'));
+        $isUnique = $this->userService->isUniqueEmail($request->get('email'), $request->get('id'));
 
         return Response::jsonSuccess($isUnique);
     }
