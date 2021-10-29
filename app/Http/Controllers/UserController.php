@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Users\UserLoginRequest;
 use App\Http\Requests\Users\UserRegisterRequest;
+use App\Http\Requests\Users\UserUniqueProfileRequest;
 use App\Http\Requests\Users\UserUpdateProfileRequest;
 use App\Services\UserService;
 use Illuminate\Http\Response;
@@ -80,5 +81,18 @@ class UserController extends Controller
         $this->userService->updateProfile($user, $request->validated());
 
         return Response::jsonSuccess(['user' => $user]);
+    }
+
+    /**
+     * Check if user emaii is unique
+     * 
+     * @param UserUniqueProfileRequest $request
+     * @return JsonResponse
+     */
+    public function isUniqueEmail(UserUniqueProfileRequest $request): JsonResponse
+    {
+        $isUnique = $this->userService->isUniqueEmail($request->get('email'));
+
+        return Response::jsonSuccess($isUnique);
     }
 }

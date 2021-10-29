@@ -21,6 +21,7 @@ Route::prefix('/users')->group(function () {
     Route::get('/{user}/verify/{token}', [UserController::class, 'verify']);
     Route::post('/register', [UserController::class, 'register']);
     Route::post('/login', [UserController::class, 'login']);
+    Route::post('/unique/email', [UserController::class, 'isUniqueEmail']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth', [UserController::class, 'auth']);

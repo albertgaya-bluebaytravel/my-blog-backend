@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-use function PHPUnit\Framework\assertNotEmpty;
-
 /** @group UsersTest */
 class UsersTest extends TestCase
 {
@@ -251,5 +249,36 @@ class UsersTest extends TestCase
         $this->assertEquals($user->name, $dataUser['name']);
         $this->assertEquals($user->email, $dataUser['email']);
         $this->assertTrue(Hash::check('123', $user->password));
+    }
+
+    /** @test */
+    public function post_users_unique_email_required_parameters(): void
+    {
+        $response = $this->postJson($this->uri("users/unique/email"))
+            ->assertUnprocessable();
+        $errors = $this->assertErrorJsonResponse($response)['errors'];
+        $this->assertCount(1, $errors);
+        $this->assertArrayHasKey('email', $errors);
+    }
+
+    /** @test */
+    public function post_users_unique_email_existing(): void
+    {
+        $user = User::factory()->create();
+        $response = $this->postJson($this->uri("users/unique/email"), ['email' => $user->email])
+            ->assertOk();
+
+        $data = $this->assertSuccessJsonResponse($response)['data'];
+        $this->assertFalse($data);
+    }
+
+    /** @test */
+    public function post_users_unique_email_non_existing(): void
+    {
+        $response = $this->postJson($this->uri("users/unique/email"), ['email' => $this->faker->email()])
+            ->assertOk();
+
+        $data = $this->assertSuccessJsonResponse($response)['data'];
+        $this->assertTrue($data);
     }
 }

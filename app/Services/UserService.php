@@ -70,6 +70,13 @@ class UserService
         }
     }
 
+    /**
+     * Update user profile
+     * 
+     * @param User $user
+     * @param array $data
+     * @return bool
+     */
     public function updateProfile(User $user, array $data): bool
     {
         if (!$data['password_change']) {
@@ -79,5 +86,16 @@ class UserService
         unset($data['password_change']);
 
         return $this->update($user, $data);
+    }
+
+    /**
+     * Check if email is unique
+     * 
+     * @param string $email
+     * @param bool
+     */
+    public function isUniqueEmail(string $email): bool
+    {
+        return !User::where('email', $email)->exists();
     }
 }
