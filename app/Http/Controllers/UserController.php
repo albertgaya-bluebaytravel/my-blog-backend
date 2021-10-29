@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Users\UserLoginRequest;
 use App\Http\Requests\Users\UserRegisterRequest;
+use App\Http\Requests\Users\UserUpdateProfileRequest;
 use App\Services\UserService;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
@@ -65,5 +66,19 @@ class UserController extends Controller
     public function auth(Request $request): JsonResponse
     {
         return Response::jsonSuccess(['user' => $request->user()]);
+    }
+
+    /**
+     * Update user profile
+     * 
+     * @param UserUpdateProfileRequest $request
+     * @param User $user
+     * @return JsonResponse
+     */
+    public function updateProfile(UserUpdateProfileRequest $request, User $user): JsonResponse
+    {
+        $this->userService->updateProfile($user, $request->validated());
+
+        return Response::jsonSuccess(['user' => $user]);
     }
 }

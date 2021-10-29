@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 use function PHPUnit\Framework\assertNotEmpty;
@@ -200,5 +201,55 @@ class UsersTest extends TestCase
         $this->assertArrayHasKey('user', $data);
         $dataUser = $data['user'];
         $this->assertEquals($user->id, $dataUser['id']);
+    }
+
+    /** @test */
+    public function patch_users_profile_non_signin_user(): void
+    {
+        $user = User::factory()->create();
+        $response = $this->patchJson($this->uri("/users/{$user->id}/profile"))
+            ->assertUnauthorized();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function patch_users_profile_non_owner_user(): void
+    {
+        $this->createSigninUser();
+        $user = User::factory()->create();
+        $response = $this->patchJson($this->uri("/users/{$user->id}/profile"))
+            ->assertForbidden();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function patch_users_profile_validate_email(): void
+    {
+        $user = $this->createSigninUser();
+
+        $response = $this->patchJson($this->uri("/users/{$user->id}/profile"), [
+            'email' => User::factory()->create()->email
+        ])
+            ->assertUnprocessable();
+        $this->assertErrorJsonResponse($response);
+    }
+
+    /** @test */
+    public function patch_users_profile(): void
+    {
+        $user = User::factory()->verified()->create(['password' => '123']);
+        Sanctum::actingAs($user);
+
+        $param = $this->data() + ['password_change' => true];
+        $response = $this->patchJson($this->uri("users/{$user->id}/profile"), $param)->assertOk();
+
+        $data = $this->assertSuccessJsonResponse($response)['data'];
+
+        $this->assertArrayHasKey('user', $data);
+        $dataUser = $data['user'];
+        $user->refresh();
+        $this->assertEquals($user->name, $dataUser['name']);
+        $this->assertEquals($user->email, $dataUser['email']);
+        $this->assertTrue(Hash::check('123', $user->password));
     }
 }

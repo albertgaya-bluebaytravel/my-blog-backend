@@ -14,7 +14,7 @@ class UserService
      * Store user
      * 
      * @param array $data
-     * @param User
+     * @return User
      */
     public function store(array $data): User
     {
@@ -23,6 +23,18 @@ class UserService
         $user->save();
         $user->sendEmailVerificationNotification();
         return $user;
+    }
+
+    /**
+     * Update user
+     * 
+     * @param User $user
+     * @param array $data
+     * @return bool
+     */
+    public function update(User $user, array $data): bool
+    {
+        return $user->update($data);
     }
 
     /**
@@ -56,5 +68,16 @@ class UserService
         if (!Auth::attempt(['email' => $email, 'password' => $password, 'is_active' => 1])) {
             throw new UnprocessableEntityHttpException('The provided credentials are incorrect!');
         }
+    }
+
+    public function updateProfile(User $user, array $data): bool
+    {
+        if (!$data['password_change']) {
+            unset($data['password']);
+        }
+
+        unset($data['password_change']);
+
+        return $this->update($user, $data);
     }
 }
